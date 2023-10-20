@@ -1,12 +1,33 @@
 // Simple test for Burroughs barGraph on Arduino. 
 // Aart, 10-2023
- 
+int P1=D2;
+int P2=D3;
+int P3=D4; //Also LED pin :/
+int R=D5;
+int A1=D7;
+int A2=D8;
+
+#define ANODE_ON LOW
+#define ANODE_OFF HIGH
+#define CATHODE_ON HIGH
+#define CATHODE_OFF LOW
+
 void setup() {
   // put your setup code here, to run once:
-  pinMode(2, OUTPUT); // Reset kathode
-  pinMode(3, OUTPUT); // A kathodes
-  pinMode(4, OUTPUT); // B kathodes
-  pinMode(5, OUTPUT); // C kathodes
+  pinMode(R, OUTPUT); // Reset kathode
+  pinMode(P1, OUTPUT); // A kathodes
+  pinMode(P2, OUTPUT); // B kathodes
+  pinMode(P3, OUTPUT); // C kathodes
+
+ //all phase pins to low turns on
+digitalWrite(P1,CATHODE_OFF);
+digitalWrite(P2,CATHODE_OFF);
+digitalWrite(P3,CATHODE_OFF);
+digitalWrite(R, CATHODE_OFF);
+
+//anodes on!
+digitalWrite(A1, ANODE_ON);
+digitalWrite(A2, ANODE_ON);
 }
  
 void loop() {
@@ -27,33 +48,33 @@ void scan_segments() {
  
   switch (state) {
     case RESET: 
-      digitalWrite(2, HIGH); 
-      digitalWrite(3, LOW); 
-      digitalWrite(4, LOW); 
-      digitalWrite(5, LOW); 
+      digitalWrite(R, CATHODE_ON); 
+      digitalWrite(P1, CATHODE_OFF); 
+      digitalWrite(P2, CATHODE_OFF); 
+      digitalWrite(P3, CATHODE_OFF); 
       state = A; 
     break;
     case A:
-      digitalWrite(3, HIGH); 
-      digitalWrite(2, LOW); 
-      digitalWrite(4, LOW); 
-      digitalWrite(5, LOW); 
+      digitalWrite(P1, CATHODE_ON); 
+      digitalWrite(R, CATHODE_OFF); 
+      digitalWrite(P2, CATHODE_OFF); 
+      digitalWrite(P3, CATHODE_OFF); 
       state = B; 
       segment++;
     break;
     case B:
-      digitalWrite(4, HIGH); 
-      digitalWrite(2, LOW); 
-      digitalWrite(3, LOW); 
-      digitalWrite(5, LOW); 
+      digitalWrite(P2, CATHODE_ON); 
+      digitalWrite(R, CATHODE_OFF); 
+      digitalWrite(P1, CATHODE_OFF); 
+      digitalWrite(P3, CATHODE_OFF); 
       state = C; 
       segment++;
     break;
     case C:
-      digitalWrite(5, HIGH); 
-      digitalWrite(2, LOW); 
-      digitalWrite(3, LOW); 
-      digitalWrite(4, LOW); 
+      digitalWrite(P3, CATHODE_ON); 
+      digitalWrite(R, CATHODE_OFF); 
+      digitalWrite(P1, CATHODE_OFF); 
+      digitalWrite(P2, CATHODE_OFF); 
       segment++; 
       state = A; 
     break; 
