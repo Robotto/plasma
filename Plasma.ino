@@ -1,4 +1,77 @@
-int P1=D2;
+// Simple test for Burroughs barGraph on Arduino. 
+// Aart, 10-2023
+ 
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(2, OUTPUT); // Reset kathode
+  pinMode(3, OUTPUT); // A kathodes
+  pinMode(4, OUTPUT); // B kathodes
+  pinMode(5, OUTPUT); // C kathodes
+}
+ 
+void loop() {
+  // put your main code here, to run repeatedly:
+  scan_segments(); 
+}
+ 
+void scan_segments() { 
+  static int state = 0, segment = 0, count = 0; 
+  static unsigned long lastTime = 0; 
+  enum state {RESET, A, B, C}; 
+ 
+  // Run once every 70 us
+  if ((micros() - lastTime) < 70 ) {
+    return; 
+  }
+  lastTime = micros(); 
+ 
+  switch (state) {
+    case RESET: 
+      digitalWrite(2, HIGH); 
+      digitalWrite(3, LOW); 
+      digitalWrite(4, LOW); 
+      digitalWrite(5, LOW); 
+      state = A; 
+    break;
+    case A:
+      digitalWrite(3, HIGH); 
+      digitalWrite(2, LOW); 
+      digitalWrite(4, LOW); 
+      digitalWrite(5, LOW); 
+      state = B; 
+      segment++;
+    break;
+    case B:
+      digitalWrite(4, HIGH); 
+      digitalWrite(2, LOW); 
+      digitalWrite(3, LOW); 
+      digitalWrite(5, LOW); 
+      state = C; 
+      segment++;
+    break;
+    case C:
+      digitalWrite(5, HIGH); 
+      digitalWrite(2, LOW); 
+      digitalWrite(3, LOW); 
+      digitalWrite(4, LOW); 
+      segment++; 
+      state = A; 
+    break; 
+  }
+ 
+  if (segment > (count/2)) { // end bar at count
+    segment = 0; 
+    count++; 
+    state = RESET; 
+  }
+ 
+  if (count > 400) { 
+    count = 0;
+  }
+ 
+}
+
+/*int P1=D2;
 int P2=D3;
 int P3=D4; //Also LED pin :/
 int R=D5;
@@ -113,3 +186,4 @@ void reset(){
       delayMicroseconds(RESET_DELAY_MICROSECONDS);
       digitalWrite(R, CATHODE_OFF);
 }
+*/
