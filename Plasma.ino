@@ -21,7 +21,7 @@ void setup() {
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
 
-  //all phase pins to low turns on
+  //all phase pins off
   digitalWrite(P1, CATHODE_OFF);
   digitalWrite(P2, CATHODE_OFF);
   digitalWrite(P3, CATHODE_OFF);
@@ -35,7 +35,7 @@ void setup() {
 #define PHASOR_DELAY_MICROSECONDS 70
 #define RESET_DELAY_MICROSECONDS 140
 
-uint8_t segmentCounter = 0; //continuously runing from 0 to 100.
+uint8_t segmentCounter = 0; //continuously runing from 0 to 199.
 unsigned long nextPhaseAtMicros = 0;
 
 uint8_t target_1=0;
@@ -44,7 +44,6 @@ uint8_t target_2=0;
 unsigned long nextRetargeting=0;
 int delta=1;
 void loop() {
-// put your main code here, to run repeatedly:
 
 if(millis()>nextRetargeting){
   if(target_1>183) delta=-1;
@@ -56,24 +55,36 @@ if(millis()>nextRetargeting){
 
 if ( micros() > nextPhaseAtMicros)  
   {
-    phasor();  //phasor runs at 70 hz = Every 14 miliseconds (counts to 100 in 1.40 seconds)
+    phasor();  //phasor runs at 70 hz = Every 14 miliseconds (counts to 200 in 2.80 seconds)
     //segmentCounter=segmentCounter%200; //keep going  from 0 to 199 (1-200)
-    if(segmentCounter==200){
-      segmentCounter=0;
-      reset();
-    }
-    nextPhaseAtMicros=micros()+PHASOR_DELAY_MICROSECONDS;
+
   }  
 }
  
 void phasor()
 {
-  // digitalWrite(A1,ANODE_OFF);
-  // digitalWrite(A2,ANODE_OFF);
 
-//delayMicroseconds(3);
+  if(segmentCounter==200){
+      
+      segmentCounter=0;
 
+      //All phases to 0:
+      digitalWrite(P1,CATHODE_OFF);
+      digitalWrite(P2,CATHODE_OFF);
+      digitalWrite(P3,CATHODE_OFF);
+
+      //Pulse the reset pin:
+      digitalWrite(R, CATHODE_ON);
+      delayMicroseconds(PHASOR_DELAY_MICROSECONDS);
+
+      digitalWrite(A1,ANODE_ON);
+      digitalWrite(A2,ANODE_ON);
+
+  }
 //Every third count comes back to the same state.
+else{
+  digitalWrite(R, CATHODE_OFF);
+
   switch ( segmentCounter%3 ){ 
     case 0:
       digitalWrite(P1, CATHODE_ON);
@@ -94,24 +105,10 @@ void phasor()
       break;
   }
   
-  //Pulse the Anodes:
   if( target_1 < segmentCounter) digitalWrite(A1,ANODE_OFF);
   if( target_2 < segmentCounter) digitalWrite(A2,ANODE_OFF);
-
+}
   segmentCounter++;
+  nextPhaseAtMicros=micros()+PHASOR_DELAY_MICROSECONDS;  
 }
 
-void reset(){
- //All phases to 0:
-      digitalWrite(P1,CATHODE_OFF);
-      digitalWrite(P2,CATHODE_OFF);
-      digitalWrite(P3,CATHODE_OFF);
-
-      //Pulse the reset pin:
-      digitalWrite(R, CATHODE_ON);
-      delayMicroseconds(RESET_DELAY_MICROSECONDS);
-      digitalWrite(R, CATHODE_OFF);
-
-      digitalWrite(A1,ANODE_ON);
-      digitalWrite(A2,ANODE_ON);
-}
