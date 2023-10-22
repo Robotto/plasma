@@ -39,7 +39,7 @@ uint8_t segmentCounter = 0; //continuously runing from 0 to 199.
 unsigned long nextPhaseAtMicros = 0;
 
 int target_1=0;
-int target_2=1;
+int target_2=0;
 
  int frq=1;
  int offset = 100;
@@ -47,32 +47,29 @@ int target_2=1;
 
 void loop() {
 
- target_1 = (amplitude * sin(2 * PI * frq * micros() * 0.000001) + offset);
- target_2 = (amplitude * cos(2 * PI * frq * micros() * 0.000001) + offset);
+  target_1 = (amplitude * sin(2 * PI * frq * micros() * 0.000001) + offset);
+  target_2 = (amplitude * cos(2 * PI * frq * micros() * 0.000001) + offset);
 
-if ( micros() > nextPhaseAtMicros) phasor();  //phasor runs at 70 hz = Every 14 miliseconds (counts to 200 in 2.80 seconds)
+  if ( micros() > nextPhaseAtMicros) phasor();
 }
  
 void phasor()
 {
-    //segmentCounter=segmentCounter%200; //keep going  from 0 to 199 (1-200)
-
   if(segmentCounter==200){
       
       segmentCounter=2;
 
       //All phases to 0:
-      digitalWrite(P1,CATHODE_OFF);
-      digitalWrite(P2,CATHODE_OFF);
-      digitalWrite(P3,CATHODE_OFF);
+      digitalWrite(P1, CATHODE_OFF);
+      digitalWrite(P2, CATHODE_OFF);
+      digitalWrite(P3, CATHODE_OFF);
 
       //Pulse the reset pin:
       digitalWrite(R, CATHODE_ON);
       delayMicroseconds(PHASOR_DELAY_MICROSECONDS);
 
-      digitalWrite(A1,ANODE_ON);
-      digitalWrite(A2,ANODE_ON);
-
+      digitalWrite(A1, ANODE_ON);
+      digitalWrite(A2, ANODE_ON);
   }
 //Every third count comes back to the same state.
 else{
@@ -80,28 +77,28 @@ else{
 
   switch ( segmentCounter%3 ){ 
     case 0:
-      digitalWrite(P1, CATHODE_ON);
+      digitalWrite(P1, CATHODE_ON );
       digitalWrite(P2, CATHODE_OFF);
       digitalWrite(P3, CATHODE_OFF);
       break;
     case 1:
       digitalWrite(P1, CATHODE_OFF);
-      digitalWrite(P2, CATHODE_ON);
+      digitalWrite(P2, CATHODE_ON );
       digitalWrite(P3, CATHODE_OFF);
       break;
     case 2:
       digitalWrite(P1, CATHODE_OFF);
       digitalWrite(P2, CATHODE_OFF);
-      digitalWrite(P3, CATHODE_ON);
+      digitalWrite(P3, CATHODE_ON );
       break;
     default: //should never happen, but here we go anyway... 
       break;
   }
   
-  if( target_1 < segmentCounter) digitalWrite(A1,ANODE_OFF);
-  if( target_2 < segmentCounter) digitalWrite(A2,ANODE_OFF);
+  if( target_1 < segmentCounter) digitalWrite(A1, ANODE_OFF);
+  if( target_2 < segmentCounter) digitalWrite(A2, ANODE_OFF);
 }
   segmentCounter++;
-  nextPhaseAtMicros=micros()+PHASOR_DELAY_MICROSECONDS;  
+  nextPhaseAtMicros = micros() + PHASOR_DELAY_MICROSECONDS;  
 }
 
