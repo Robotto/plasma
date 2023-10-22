@@ -38,35 +38,28 @@ void setup() {
 uint8_t segmentCounter = 0; //continuously runing from 0 to 199.
 unsigned long nextPhaseAtMicros = 0;
 
-uint8_t target_1=0;
-uint8_t target_2=0;
+int target_1=0;
+int target_2=1;
 
-unsigned long nextRetargeting=0;
-int delta=1;
+ int frq=1;
+ int offset = 100;
+ int amplitude = 100;
+
 void loop() {
 
-if(millis()>nextRetargeting){
-  if(target_1>183) delta=-1;
-  if(target_1==0) delta=1;
-  target_1+=delta;
-  target_2=target_1;
-  nextRetargeting=millis()+1;
-  }
+ target_1 = (amplitude * sin(2 * PI * frq * micros() * 0.000001) + offset);
+ target_2 = (amplitude * cos(2 * PI * frq * micros() * 0.000001) + offset);
 
-if ( micros() > nextPhaseAtMicros)  
-  {
-    phasor();  //phasor runs at 70 hz = Every 14 miliseconds (counts to 200 in 2.80 seconds)
-    //segmentCounter=segmentCounter%200; //keep going  from 0 to 199 (1-200)
-
-  }  
+if ( micros() > nextPhaseAtMicros) phasor();  //phasor runs at 70 hz = Every 14 miliseconds (counts to 200 in 2.80 seconds)
 }
  
 void phasor()
 {
+    //segmentCounter=segmentCounter%200; //keep going  from 0 to 199 (1-200)
 
   if(segmentCounter==200){
       
-      segmentCounter=0;
+      segmentCounter=2;
 
       //All phases to 0:
       digitalWrite(P1,CATHODE_OFF);
